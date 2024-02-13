@@ -1,0 +1,71 @@
+module sasso_carta_forbici_tb;
+
+  // Inputs
+    logic clk;
+    logic reset;
+    logic [1:0] PRIMO;
+    logic [1:0] SECONDO;
+  
+    // Outputs
+    logic [1:0] MANCHE;
+    logic [1:0] PARTITA;
+
+    // Instantiate the Device Under Test (DUT)
+    sasso_carta_forbici_tb DUT (
+        .clk(clk),
+        .reset(reset),
+        .PRIMO(PRIMO),
+        .SECONDO(SECONDO),
+        .MANCHE(MANCHE),
+        .PARTITA(PARTITA)
+    );
+
+    // Clock signal
+    always #5 clk = ~clk;
+
+    // Test sequence
+    initial begin
+        // Initialize inputs
+        clk = 1'b0;
+        reset = 1'b1;
+        PRIMO = 2'b00;
+        SECONDO = 2'b00;
+
+        // Wait for the DUT to reset
+        #10;
+
+        // Start the game
+        reset = 1'b0;
+
+        // Play a few rounds
+        PRIMO = 2'b01; // Sasso
+        SECONDO = 2'b10; // Carta
+        #10;
+
+        PRIMO = 2'b10; // Carta
+        SECONDO = 2'b01; // Sasso
+        #10;
+
+        PRIMO = 2'b11; // Forbice
+        SECONDO = 2'b01; // Sasso
+        #10;
+
+        PRIMO = 2'b01; // Sasso
+        SECONDO = 2'b11; // Forbice
+        #10;
+
+        // Check the results
+      assert(PARTITA == 2'b00) $display ("Partita non terminata");
+
+        // End the game
+        reset = 1'b1;
+        #10;
+
+        // Check the final results
+      assert(PARTITA == 2'b11) $display ("Partita terminata in pareggio");
+
+        // Finish the testbench
+        $finish;
+    end;
+
+endmodule
